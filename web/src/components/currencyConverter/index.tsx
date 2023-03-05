@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from 'react'
+import { useContext } from 'react'
 
 import Image from 'next/image'
 
@@ -8,82 +8,22 @@ import styles from './styles.module.scss'
 
 import currencies from '../../../datas/currencies.json'
 
+import { CurrenciesContext } from '@/contexts/currenciesContext'
+
 export function CurrencyConverter() {
 
-    const [bidCurrency, setBidCurrency] = useState<number>(1)
+    const {
+        handleChangeCurrencyInput,
+        firstCurrencyValue,
+        secondCurrencyValue,
+        setFromCurrencySymbol,
+        setToCurrencySymbol
+    } = useContext(CurrenciesContext)
 
-    const [firstCurrencyValue, setFirstCurrencyValue] = useState(1)
-    const [secondCurrencyValue, setSecondCurrencyValue] = useState(1)
-
-    const [fromCurrencySymbol, setFromCurrencySymbol] = useState<string>('AED')
-    const [toCurrencySymbol, setToCurrencySymbol] = useState<string>('AED')
 
     function stringNumberWithCommas(value: number) {
         return value.toLocaleString('en-US')
     }
-
-    function handleChangeInput(event: React.ChangeEvent<HTMLInputElement>) {
-        const targetId = event.target.id as 'first' || 'second'
-        const eventValue = Number(event.target.value?.replaceAll(',', ''))
-
-        if (targetId == 'first') {
-            setFirstCurrencyValue(eventValue)
-            setSecondCurrencyValue(Number((eventValue * bidCurrency).toFixed(2)))
-        } else {
-            setFirstCurrencyValue(Number((eventValue / bidCurrency).toFixed(2)))
-            setSecondCurrencyValue(eventValue)
-        }
-
-    }
-
-    async function fetchBidCurrency() {
-
-        console.log('fetch')
-
-        const apikey = process.env.ALPHA_VANTAGE_API_KEY || ''
-
-        const response = await fetch(
-            "https://www.alphavantage.co/query?" + new URLSearchParams({
-                function:'FX_DAILY',
-                from_symbol:fromCurrencySymbol,
-                to_symbol: toCurrencySymbol,
-                outputsize:'compact',
-                apikey
-            }) 
-        )
-
-        const responseData = await response.json()
-
-        const dailys = responseData["Time Series FX (Daily)"]
-
-        if(!dailys){
-            //TODO: Return error
-            console.log('error:')
-            console.log(responseData)
-            return 
-        }
-
-        const dailysDays = Object.keys(dailys)
-        const lastCurrencyBid = dailys[dailysDays[0]]["2. high"]
-
-        setSecondCurrencyValue(Number((firstCurrencyValue * lastCurrencyBid).toFixed(2)))
-        setBidCurrency(lastCurrencyBid)
-
-
-    }
-
-    useEffect(() => {
-        if (!fromCurrencySymbol || !toCurrencySymbol) {
-            return
-        }
-
-        if (fromCurrencySymbol === toCurrencySymbol) {
-            return setBidCurrency(1)
-        }
-
-        fetchBidCurrency();
-    }, [fromCurrencySymbol, toCurrencySymbol])
-
 
     return (
         <div className={styles.container}>
@@ -98,7 +38,7 @@ export function CurrencyConverter() {
                         type="text"
                         id="first"
                         value={stringNumberWithCommas(firstCurrencyValue)}
-                        onInput={handleChangeInput}
+                        onInput={handleChangeCurrencyInput}
                     />
 
                     <div className={styles.selectContainer}>
@@ -134,7 +74,7 @@ export function CurrencyConverter() {
                         type="text"
                         id="second"
                         value={stringNumberWithCommas(secondCurrencyValue)}
-                        onInput={handleChangeInput}
+                        onInput={handleChangeCurrencyInput}
                     />
                     <div className={styles.selectContainer}>
 
