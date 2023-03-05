@@ -8,7 +8,7 @@ import styles from './styles.module.scss'
 
 import currencies from '../../../datas/currencies.json'
 
-import { CurrenciesContext } from '@/contexts/currenciesContext'
+import { CurrenciesContext } from '@/contexts/CurrenciesContext'
 
 export function CurrencyConverter() {
 

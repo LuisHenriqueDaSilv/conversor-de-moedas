@@ -11,7 +11,7 @@ import styles from './styles.module.scss'
 
 import { CurrencyConverter } from '@/components/currencyConverter'
 import { CurrencyHistory } from '@/components/currencyHistory'
-import { CurrenciesProvider } from '@/contexts/currenciesContext'
+import { CurrenciesProvider } from '@/contexts/CurrenciesContext'
 
 
 export default function Home() {
